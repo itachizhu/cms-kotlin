@@ -1,0 +1,43 @@
+group 'org.itachi'
+version '1.0.0'
+
+buildscript {
+    ext.kotlin_version = '1.1.2'
+
+    repositories {
+        jcenter()
+        //mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+repositories {
+    jcenter()
+    //mavenCentral()
+}
+
+configurations {
+    compile.exclude(group:"org.springframework.boot", module:"spring-boot-starter-logging")
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-log4j2"
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.8"
+    compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.0"
+    compile "mysql:mysql-connector-java:6.0.6"
+    compile "javax.ws.rs:javax.ws.rs-api:2.0.1"
+}
