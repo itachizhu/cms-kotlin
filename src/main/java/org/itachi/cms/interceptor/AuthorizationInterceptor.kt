@@ -3,7 +3,6 @@ package org.itachi.cms.interceptor
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.itachi.cms.constant.Constants
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.MessageSource
@@ -25,8 +24,8 @@ import javax.servlet.http.HttpServletResponse
  * Time: 16:41
  */
 @Component
-class AuthorizationInterceptor : HandlerInterceptor {
-    private val LOGGER = LoggerFactory.getLogger(AuthorizationInterceptor::class.java)
+open class AuthorizationInterceptor() : HandlerInterceptor {
+    // private val LOGGER = LoggerFactory.getLogger(AuthorizationInterceptor::class.java)
 
     @Autowired
     @Qualifier("messageSource")
@@ -37,12 +36,7 @@ class AuthorizationInterceptor : HandlerInterceptor {
 
     private val mapper = ObjectMapper()
 
-    constructor() {
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-    }
-
     override fun preHandle(request: HttpServletRequest?, response: HttpServletResponse?, handler: Any?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         this.request = request
         this.response = response
 
@@ -58,7 +52,6 @@ class AuthorizationInterceptor : HandlerInterceptor {
         } catch (e: Exception) {
             return false
         }
-
     }
 
     @Throws(Exception::class)
@@ -71,12 +64,12 @@ class AuthorizationInterceptor : HandlerInterceptor {
             result.plus(Pair("message", "session不存在，用户没登陆"))
             clearCookies()
             if (apiFlag) {
-                response!!.setStatus(HttpStatus.UNAUTHORIZED.value())
-                response!!.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                response!!.getWriter().append(mapper.writeValueAsString(result)).flush()
-                response!!.getWriter().close()
+                response!!.status = HttpStatus.UNAUTHORIZED.value()
+                response!!.contentType = MediaType.APPLICATION_JSON_UTF8_VALUE
+                response!!.writer.append(mapper.writeValueAsString(result)).flush()
+                response!!.writer.close()
             } else {
-                response!!.sendRedirect(request!!.getContextPath() + "/" + url)
+                response!!.sendRedirect(request!!.contextPath + "/" + url)
             }
             return false
         }
@@ -86,12 +79,12 @@ class AuthorizationInterceptor : HandlerInterceptor {
             result.plus(Pair("message", "session不存在，用户没登陆"))
             clearCookies()
             if (apiFlag) {
-                response!!.setStatus(HttpStatus.UNAUTHORIZED.value())
-                response!!.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                response!!.getWriter().append(mapper.writeValueAsString(result)).flush()
-                response!!.getWriter().close()
+                response!!.status = HttpStatus.UNAUTHORIZED.value()
+                response!!.contentType = MediaType.APPLICATION_JSON_UTF8_VALUE
+                response!!.writer.append(mapper.writeValueAsString(result)).flush()
+                response!!.writer.close()
             } else {
-                response!!.sendRedirect(url)
+                response!!.sendRedirect(request!!.contextPath + "/" + url)
             }
             return false
         }
@@ -145,5 +138,9 @@ class AuthorizationInterceptor : HandlerInterceptor {
 
     override fun afterCompletion(request: HttpServletRequest?, response: HttpServletResponse?, handler: Any?, ex: Exception?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    init {
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
     }
 }

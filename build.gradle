@@ -11,13 +11,52 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE"
+        classpath "com.bmuschko:gradle-docker-plugin:3.0.7"
+        //classpath "se.transmode.gradle:gradle-docker:1.2"
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'idea'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.bmuschko.docker-remote-api'
+//apply plugin: 'docker'
+
+//archivesBaseName = 'cms-kotlin'
+
+jar {
+    baseName = 'cms-kotlin'
+    archiveName = 'cms-kotlin.jar'
+}
+
+/*
+task buildDocker(type: Docker, dependsOn: build) {
+    push = true
+    useApi = true
+    hostUrl = 'https://192.168.99.100:2376'
+    applicationName = jar.baseName
+    dockerfile = file('src/main/docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
+}
+*/
+docker {
+    url = 'https://192.168.99.100:2376'
+    certPath = new File('/Users/itachi/.docker/machine/machines/default')
+}
+
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+task buildImage(type: DockerBuildImage, dependsOn: build) {
+    dockerFile = project.file('src/main/docker/Dockerfile')
+    inputDir = project.file('build/libs/cms-kotlin.jar').parentFile
+    tag = 'itachikotlin/cms'
+}
 
 repositories {
     jcenter()
@@ -40,4 +79,5 @@ dependencies {
     compile "org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.0"
     compile "mysql:mysql-connector-java:6.0.6"
     compile "javax.ws.rs:javax.ws.rs-api:2.0.1"
+    compile "org.apache.commons:commons-lang3:3.5"
 }

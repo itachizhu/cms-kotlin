@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * Time: 22:22
  */
 @Configuration
-class WebConfigurerAdapter : WebMvcConfigurerAdapter() {
+open class WebConfigurerAdapter : WebMvcConfigurerAdapter() {
     @Autowired
     private val authorizationInterceptor: AuthorizationInterceptor? = null
 
