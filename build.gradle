@@ -50,11 +50,19 @@ docker {
     certPath = new File('/Users/itachi/.docker/machine/machines/default')
 }
 
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
-task buildImage(type: DockerBuildImage, dependsOn: build) {
-    dockerFile = project.file('src/main/docker/Dockerfile')
-    inputDir = project.file('build/libs/cms-kotlin.jar').parentFile
+task createDockerfile(type: Dockerfile, dependsOn: build) {
+    destFile = project.file('src/main/docker/Dockerfile')
+    from 'java:8-jre'
+    maintainer 'itachizhu'
+}
+
+task buildImage(type: DockerBuildImage, dependsOn: createDockerfile) {
+    //dockerFile = project.file('src/main/docker/Dockerfile')
+    inputDir = createDockerfile.destFile.parentFile
     tag = 'itachikotlin/cms'
 }
 

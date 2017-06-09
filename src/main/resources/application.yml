@@ -1,7 +1,7 @@
 debug: true
 server:
   context-path: /cms
-  port: 9091
+  port: 9097
   tomcat:
 #    basedir: target/cms-boot
     accesslog:
