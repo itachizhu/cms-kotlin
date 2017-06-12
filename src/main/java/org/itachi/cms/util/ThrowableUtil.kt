@@ -23,12 +23,12 @@ class ThrowableUtil {
     private val LOGGER = LoggerFactory.getLogger(ThrowableUtil::class.java)
 
     @Throws(Exception::class)
-    fun handleThrowable(result: Map<String, Any?>, throwable: Throwable): HttpStatus {
+    fun handleThrowable(result: MutableMap<String, Any?>, throwable: Throwable): HttpStatus {
         LOGGER.debug("==========handleThrowable==========")
         return handleCommonThrowable(result, throwable)
     }
 
-    fun handleException(result: Map<String, Any?>, cause: Throwable, message: String): HttpStatus {
+    fun handleException(result: MutableMap<String, Any?>, cause: Throwable, message: String): HttpStatus {
         try {
             if (cause is BaseException) {
                 return handleBaseException(result, cause as BaseException)
@@ -46,25 +46,25 @@ class ThrowableUtil {
 
     }
 
-    fun handleException(result: Map<String, Any?>, cause: Throwable): HttpStatus {
+    fun handleException(result: MutableMap<String, Any?>, cause: Throwable): HttpStatus {
         return handleException(result, cause, "web server handle data exception!")
     }
 
-    private fun handleBadSqlGrammarException(result: Map<String, Any?>, cause: BadSqlGrammarException): HttpStatus {
+    private fun handleBadSqlGrammarException(result: MutableMap<String, Any?>, cause: BadSqlGrammarException): HttpStatus {
         LOGGER.error("====BadSqlGrammarException: {} \n\n {} \n\n {}", cause, cause.sql, cause.message)
-        result.plus(Pair(CODE, if (cause.sqlException == null || cause.sqlException.errorCode == 200) 417 else cause.sqlException.errorCode))
-        result.plus(Pair(MESSAGE, cause.message))
+        result.put(CODE, if (cause.sqlException == null || cause.sqlException.errorCode == 200) 417 else cause.sqlException.errorCode)
+        result.put(MESSAGE, cause.message)
         return HttpStatus.SERVICE_UNAVAILABLE
     }
 
-    private fun handleSQLException(result: Map<String, Any?>, cause: SQLException): HttpStatus {
+    private fun handleSQLException(result: MutableMap<String, Any?>, cause: SQLException): HttpStatus {
         LOGGER.error("====SQLException: {} \n\n {} \n\n {}", cause, cause.errorCode, cause.message)
-        result.plus(Pair(CODE, if (cause.errorCode == 200) 417 else cause.errorCode))
-        result.plus(Pair(MESSAGE, cause.message))
+        result.put(CODE, if (cause.errorCode == 200) 417 else cause.errorCode)
+        result.put(MESSAGE, cause.message)
         return HttpStatus.SERVICE_UNAVAILABLE
     }
 
-    private fun handleBaseException(result: Map<String, Any?>, cause: BaseException): HttpStatus {
+    private fun handleBaseException(result: MutableMap<String, Any?>, cause: BaseException): HttpStatus {
         var status = HttpStatus.SERVICE_UNAVAILABLE
         if (cause.status != null) {
             try {
@@ -74,20 +74,20 @@ class ThrowableUtil {
             }
 
         }
-        result.plus(Pair(CODE, cause.code))
-        result.plus(Pair(MESSAGE, cause.message))
+        result.put(CODE, cause.code)
+        result.put(MESSAGE, cause.message)
         return status
     }
 
-    fun handleCommonThrowable(result: Map<String, Any?>, cause: Throwable): HttpStatus {
+    fun handleCommonThrowable(result: MutableMap<String, Any?>, cause: Throwable): HttpStatus {
         return handleCommonThrowable(result, cause, "web server handle data exception!")
     }
 
-    fun handleCommonThrowable(result: Map<String, Any?>, cause: Throwable?, message: String?): HttpStatus {
+    fun handleCommonThrowable(result: MutableMap<String, Any?>, cause: Throwable?, message: String?): HttpStatus {
         if (cause != null && cause.message != null && !cause.message.isNullOrEmpty()) {
-            result.plus(Pair(MESSAGE, cause.message))
+            result.put(MESSAGE, cause.message)
         } else if (message != null) {
-            result.plus(Pair(MESSAGE, message))
+            result.put(MESSAGE, message)
         }
 
         return HttpStatus.SERVICE_UNAVAILABLE

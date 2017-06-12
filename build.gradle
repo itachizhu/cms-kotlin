@@ -57,6 +57,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 task createDockerfile(type: Dockerfile, dependsOn: build) {
     destFile = project.file('src/main/docker/Dockerfile')
     from 'java:8-jre'
+    volume '/tmp'
     maintainer 'itachizhu'
 }
 

@@ -56,8 +56,9 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Throwable::class)
     fun handleException(throwable: Throwable, request: HttpServletRequest): ResponseEntity<*> {
-        val result = HashMap<String, Any?>()
+        var result = mutableMapOf<String, Any?>()
         result.put(CODE, 999)
+        // result[CODE] = 999
         var status = HttpStatus.SERVICE_UNAVAILABLE
         try {
             this.request = request
@@ -71,7 +72,7 @@ class GlobalExceptionHandler {
     }
 
     @Throws(Exception::class)
-    private fun handleThrowable(result: Map<String, Any?>, throwable: Throwable?): HttpStatus {
+    private fun handleThrowable(result: MutableMap<String, Any?>, throwable: Throwable?): HttpStatus {
         if (throwable is ConstraintViolationException) {
             return handleValidException(result, throwable as ConstraintViolationException?)
         }
@@ -94,14 +95,14 @@ class GlobalExceptionHandler {
     }
 
     @Throws(Exception::class)
-    private fun handleValidException(result: Map<String, Any?>, throwable: BindException?): HttpStatus {
+    private fun handleValidException(result: MutableMap<String, Any?>, throwable: BindException?): HttpStatus {
         val violations = validator!!.validate(throwable!!.target)
         if (violations != null && !violations.isEmpty()) {
             return handleValidException(result, ConstraintViolationException(violations))
         }
 
-        result.plus(Pair(CODE, 104))
-        result.plus(Pair(MESSAGE, "Parameter Error!"))
+        result.put(CODE, 104)
+        result.put(MESSAGE, "Parameter Error!")
         if (throwable.allErrors != null && !throwable.allErrors.isEmpty()) {
             val list = listOf<Map<String, Any?>>()
             for (error in throwable.allErrors) {
@@ -110,15 +111,15 @@ class GlobalExceptionHandler {
                 map.put(MESSAGE, error.defaultMessage)
                 list.plus(map)
             }
-            result.plus(Pair(ERRORS, list))
+            result.put(ERRORS, list)
         }
         return HttpStatus.BAD_REQUEST
     }
 
     @Throws(Exception::class)
-    private fun handleValidException(result: Map<String, Any?>, exception: ConstraintViolationException?): HttpStatus {
-        result.plus(Pair(CODE, 104))
-        result.plus(Pair(MESSAGE, "Parameter Error!"))
+    private fun handleValidException(result: MutableMap<String, Any?>, exception: ConstraintViolationException?): HttpStatus {
+        result.put(CODE, 104)
+        result.put(MESSAGE, "Parameter Error!")
         val messages = exception!!.constraintViolations
         if (messages != null && !messages.isEmpty()) {
             val locale = LocaleUtil.getLocale(request)
@@ -136,47 +137,47 @@ class GlobalExceptionHandler {
                 }
                 list.plus(map)
             }
-            result.plus(Pair(ERRORS, list))
+            result.put(ERRORS, list)
         }
 
         return HttpStatus.BAD_REQUEST
     }
 
     @Throws(Exception::class)
-    private fun handleValidException(result: Map<String, Any?>, exception: MissingPathVariableException?): HttpStatus {
-        result.plus(Pair(CODE, 104))
-        result.plus(Pair(MESSAGE, "Parameter Error!"))
+    private fun handleValidException(result: MutableMap<String, Any?>, exception: MissingPathVariableException?): HttpStatus {
+        result.put(CODE, 104)
+        result.put(MESSAGE, "Parameter Error!")
         val list = listOf<Map<String, Any?>>()
         val map = HashMap<String, Any?>()
         map.put(FIELD, exception!!.variableName)
         map.put(MESSAGE, exception.message)
         list.plus(map)
-        result.plus(Pair(ERRORS, list))
+        result.put(ERRORS, list)
         return HttpStatus.BAD_REQUEST
     }
 
     @Throws(Exception::class)
-    private fun handleValidException(result: Map<String, Any?>, exception: MissingServletRequestParameterException?): HttpStatus {
-        result.plus(Pair(CODE, 104))
-        result.plus(Pair(MESSAGE, "Parameter Error!"))
+    private fun handleValidException(result: MutableMap<String, Any?>, exception: MissingServletRequestParameterException?): HttpStatus {
+        result.put(CODE, 104)
+        result.put(MESSAGE, "Parameter Error!")
         val list = listOf<Map<String, Any?>>()
         val map = HashMap<String, Any?>()
         map.put(FIELD, exception!!.parameterName)
         map.put(MESSAGE, exception.message)
         list.plus(map)
-        result.plus(Pair(ERRORS, list))
+        result.put(ERRORS, list)
         return HttpStatus.BAD_REQUEST
     }
 
     @Throws(Exception::class)
-    private fun handleValidException(result: Map<String, Any?>, exception: MethodArgumentNotValidException?): HttpStatus {
+    private fun handleValidException(result: MutableMap<String, Any?>, exception: MethodArgumentNotValidException?): HttpStatus {
         val violations = validator!!.validate(exception!!.bindingResult.target)
         if (violations != null && !violations.isEmpty()) {
             return handleValidException(result, ConstraintViolationException(violations))
         }
 
-        result.plus(Pair(CODE, 104))
-        result.plus(Pair(MESSAGE, "Parameter Error!"))
+        result.put(CODE, 104)
+        result.put(MESSAGE, "Parameter Error!")
         if (exception.bindingResult != null && exception.bindingResult.allErrors != null
                 && !exception.bindingResult.allErrors.isEmpty()) {
             val list = listOf<Map<String, Any?>>()
@@ -186,7 +187,7 @@ class GlobalExceptionHandler {
                 map.put(MESSAGE, error.defaultMessage)
                 list.plus(map)
             }
-            result.plus(Pair(ERRORS, list))
+            result.put(ERRORS, list)
         }
         return HttpStatus.BAD_REQUEST
     }

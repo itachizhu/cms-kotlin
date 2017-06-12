@@ -55,13 +55,13 @@ open class AuthorizationInterceptor() : HandlerInterceptor {
     }
 
     @Throws(Exception::class)
-    private fun checkSession(result: Map<String, Any?>, servletPath: String): Boolean {
+    private fun checkSession(result: MutableMap<String, Any?>, servletPath: String): Boolean {
         val url = "login"
         val session = request!!.getSession(false)
         val apiFlag = validateApiPath(servletPath)
         if (session == null) {
-            result.plus(Pair("code", 502))
-            result.plus(Pair("message", "session不存在，用户没登陆"))
+            result.put("code", 502)
+            result.put("message", "session不存在，用户没登陆")
             clearCookies()
             if (apiFlag) {
                 response!!.status = HttpStatus.UNAUTHORIZED.value()
@@ -75,8 +75,8 @@ open class AuthorizationInterceptor() : HandlerInterceptor {
         }
 
         if (session.getAttribute(Constants.SESSION_KEY) == null) {
-            result.plus(Pair("code", 503))
-            result.plus(Pair("message", "session不存在，用户没登陆"))
+            result.put("code", 503)
+            result.put("message", "session不存在，用户没登陆")
             clearCookies()
             if (apiFlag) {
                 response!!.status = HttpStatus.UNAUTHORIZED.value()
@@ -133,11 +133,11 @@ open class AuthorizationInterceptor() : HandlerInterceptor {
 
 
     override fun postHandle(request: HttpServletRequest?, response: HttpServletResponse?, handler: Any?, modelAndView: ModelAndView?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun afterCompletion(request: HttpServletRequest?, response: HttpServletResponse?, handler: Any?, ex: Exception?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     init {
